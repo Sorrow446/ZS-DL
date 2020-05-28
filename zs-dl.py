@@ -153,4 +153,5 @@ if __name__ == '__main__':
 		try:
 			main(url)
 		except Exception as e:
+			print("Failed.")
 			print("{}: {}".format(e.__class__.__name__, e))

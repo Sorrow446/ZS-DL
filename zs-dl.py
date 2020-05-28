@@ -82,15 +82,15 @@ def check_url(url):
 	raise ValueError("Invalid URL: {}".format(url))
 
 def extract(url, server, id):
-	regex = re.compile(
-		r'document\.getElementById\(\'dlbutton\'\)\.href = "/d'
-		r'/([\w\d]{8})/" \+ \((\d*) % (\d*) \+ (\d*) % '
+	regex = (
+		r'document.getElementById\(\'dlbutton\'\).href = "/d/'
+		r'([\w\d]{8})/" \+ \((\d*) % (\d*) \+ (\d*) % '
 		r'(\d*)\) \+ "/(.*)";'
 	)
 	r = s.get(url)
 	r.raise_for_status()
 	try:
-		meta = regex.findall(r.text)[0]
+		meta = re.findall(regex, r.text)[0]
 	except IndexError:
 		raise Exception('Failed to get file URL. Down?')
 	num_1 = int(meta[1])

@@ -123,7 +123,7 @@ def download(ref, url, fname):
 	abs = os.path.join(cfg.output_path, fname)
 	if os.path.isfile(abs):
 		if cfg.overwrite:
-			print("File already exists. Will overwrite.")
+			print("File already exists locally. Will overwrite.")
 		else:
 			print("File already exists locally.")
 			return

@@ -1,7 +1,17 @@
 # ZS-DL
-Zippyshare downloader written in Python.
+CLI Zippyshare downloader written in Python. JS execution, Selenium and BSoup-**FREE**. 
+
 
 **People have been seen selling my tools. DO NOT buy them. My tools are free and always will be.**
+
+![](https://orion.feralhosting.com/sorrow/share/ZS-DL.png)
+
+# Usage
+Download two files to default directory:    
+`ZS-DL.py -u https://www1.zippyshare.com/v/00000000/file.html https://www1.zippyshare.com/v/00000000/file.html`
+
+Download from text file to "G:\ZS-DL downloads" with HTTPS proxy:   
+`ZS-DL.py -u G:\links.txt -o "G:\ZS-DL downloads" -p 0.0.0.0:8080`
 
 ```
  _____ _____     ____  __

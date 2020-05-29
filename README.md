@@ -1,5 +1,5 @@
 # ZS-DL
-CLI Zippyshare downloader written in Python. JS execution, Selenium and BSoup-**FREE**.    
+CLI Zippyshare downloader written in Python. JS execution and BSoup-**FREE**.    
 [Windows binaries](https://github.com/Sorrow446/ZS-DL/releases)
 
 **People have been seen selling my tools. DO NOT buy them. My tools are free and always will be.**

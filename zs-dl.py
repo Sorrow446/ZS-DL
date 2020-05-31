@@ -38,7 +38,7 @@ print("""
 def read_txt(abs):
 	with open(abs) as f:
 		# All into memory at once.
-		return f.readlines()
+		return [u.strip() for u in f.readlines()]
 
 def parse_prefs():
 	out_path = os.path.join(os.getcwd(), 'ZS-DL downloads')
@@ -89,15 +89,14 @@ def extract(url, server, id):
 	)
 	r = s.get(url)
 	r.raise_for_status()
-	try:
-		meta = re.findall(regex, r.text)[0]
-	except IndexError:
+	meta = re.search(regex, r.text)
+	if not meta:
 		raise Exception('Failed to get file URL. Down?')
-	num_1 = int(meta[1])
-	num_2 = int(meta[2])
-	num_3 = int(meta[3])
-	num_4 = int(meta[4])
-	enc_fname = meta[5]
+	num_1 = int(meta.group(2))
+	num_2 = int(meta.group(3))
+	num_3 = int(meta.group(4))
+	num_4 = int(meta.group(5))
+	enc_fname = meta.group(6)
 	final_num = num_1 % num_2 + num_3 % num_4
 	file_url = "https://www{}.zippyshare.com/d/{}/{}/{}".format(server,
 																id,											 

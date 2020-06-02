@@ -14,6 +14,8 @@ Download two files to default directory:
 Download from text file to "G:\ZS-DL downloads" with HTTPS proxy:   
 `ZS-DL.py -u G:\links.txt -o "G:\ZS-DL downloads" -p 0.0.0.0:8080`
 
+Download from DLC container and a single regular URL to default directory:    
+`ZS-DL.py -u https://www1.zippyshare.com/v/00000000/file.html G:\1.dlc`
 ```
  _____ _____     ____  __
 |__   |   __|___|    \|  |

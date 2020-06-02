@@ -122,7 +122,7 @@ def extract(url, server, id):
 	r.raise_for_status()
 	meta = re.search(regex, r.text)
 	if not meta:
-		raise Exception("Failed to get file URL. Down?")
+		raise Exception('Failed to get file URL. Down?')
 	num_1 = int(meta.group(2))
 	num_2 = int(meta.group(3))
 	num_3 = int(meta.group(4))

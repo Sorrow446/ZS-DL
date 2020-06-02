@@ -87,7 +87,11 @@ def extract(url, server, id):
 		r'([\w\d]{8})/" \+ \((\d*) % (\d*) \+ (\d*) % '
 		r'(\d*)\) \+ "/(.*)";'
 	)
-	r = s.get(url)
+	for _ in range(1, 4):
+		r = s.get(url)
+		if r.status_code != 500:
+			break
+		time.sleep(1)
 	r.raise_for_status()
 	meta = re.search(regex, r.text)
 	if not meta:

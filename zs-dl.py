@@ -3,6 +3,7 @@
 import os
 import re
 import sys
+import json
 import time
 import argparse
 try:
@@ -41,6 +42,19 @@ def read_txt(abs):
 		# All into memory at once.
 		return [u.strip() for u in f.readlines()]
 
+def decrypt_dlc(abs):
+	# Thank you, dcrypt owner(s).
+	url = "http://dcrypt.it/decrypt/paste"
+	r = s.post(url, data={
+			'content': open(abs)
+		}
+	)
+	r.raise_for_status()
+	j = json.loads(r.text)
+	if not j.get('success'):
+		raise Exception(j)
+	return j['success']['links']
+
 def parse_prefs():
 	out_path = os.path.join(os.getcwd(), 'ZS-DL downloads')
 	parser = argparse.ArgumentParser()
@@ -66,12 +80,24 @@ def parse_prefs():
 	args = parser.parse_args()
 	if args.urls[0].endswith('.txt'):
 		args.urls = read_txt(args.urls[0])
+	for url in args.urls:
+		if url.endswith('dlc'):
+			print("Processing DLC container: " + url)
+			args.urls.remove(url)
+			try:
+				args.urls += decrypt_dlc(url)
+			except Exception as e:
+				err("Failed to decrypt DLC container: " + url, e)
+			time.sleep(1)
 	return args
 
 def dir_setup():
 	if not os.path.isdir(cfg.output_path):
 		os.makedirs(cfg.output_path)
 
+def err(txt, e):
+	print("{}\n{}: {}".format(txt, e.__class__.__name__, e))
+	
 def set_proxy():
 	s.proxies.update({'https': 'https://' + cfg.proxy})
 	
@@ -80,7 +106,7 @@ def check_url(url):
 	match = re.match(regex, url)
 	if match:
 		return match.group(1), match.group(2)
-	raise ValueError("Invalid URL: {}".format(url))
+	raise ValueError("Invalid URL: " + str(url))
 
 def extract(url, server, id):
 	regex = (
@@ -96,7 +122,7 @@ def extract(url, server, id):
 	r.raise_for_status()
 	meta = re.search(regex, r.text)
 	if not meta:
-		raise Exception('Failed to get file URL. Down?')
+		raise Exception("Failed to get file URL. Down?")
 	num_1 = int(meta.group(2))
 	num_2 = int(meta.group(3))
 	num_3 = int(meta.group(4))
@@ -157,5 +183,4 @@ if __name__ == '__main__':
 		try:
 			main(url)
 		except Exception as e:
-			print("Failed.")
-			print("{}: {}".format(e.__class__.__name__, e))
+			err('URL failed.', e)

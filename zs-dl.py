@@ -81,7 +81,7 @@ def parse_prefs():
 	if args.urls[0].endswith('.txt'):
 		args.urls = read_txt(args.urls[0])
 	for url in args.urls:
-		if url.endswith('dlc'):
+		if url.endswith('.dlc'):
 			print("Processing DLC container: " + url)
 			args.urls.remove(url)
 			try:

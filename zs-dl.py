@@ -85,7 +85,7 @@ def parse_prefs():
 			print("Processing DLC container: " + url)
 			args.urls.remove(url)
 			try:
-				args.urls += decrypt_dlc(url)
+				args.urls.extend(decrypt_dlc(url))
 			except Exception as e:
 				err("Failed to decrypt DLC container: " + url, e)
 			time.sleep(1)

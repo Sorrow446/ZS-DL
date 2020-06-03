@@ -83,11 +83,11 @@ def parse_prefs():
 	for url in args.urls:
 		if url.endswith('.dlc'):
 			print("Processing DLC container: " + url)
-			args.urls.remove(url)
 			try:
-				args.urls.extend(decrypt_dlc(url))
+				args.urls = args.urls + decrypt_dlc(url)
 			except Exception as e:
 				err("Failed to decrypt DLC container: " + url, e)
+			args.urls.remove(url)
 			time.sleep(1)
 	return args
 

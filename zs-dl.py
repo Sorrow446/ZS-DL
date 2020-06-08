@@ -102,7 +102,7 @@ def set_proxy():
 	s.proxies.update({'https': 'https://' + cfg.proxy})
 	
 def check_url(url):
-	regex = r'https://www(\d{1,3}).zippyshare.com/v/([\w\d]{8})/file.html'
+	regex = r'https://www(\d{1,3}).zippyshare.com/v/([a-zA-Z\d]{8})/file.html'
 	match = re.match(regex, url)
 	if match:
 		return match.group(1), match.group(2)
@@ -111,7 +111,7 @@ def check_url(url):
 def extract(url, server, id):
 	regex = (
 		r'document.getElementById\(\'dlbutton\'\).href = "/d/'
-		r'([\w\d]{8})/" \+ \((\d*) % (\d*) \+ (\d*) % '
+		r'([a-zA-Z\d]{8})/" \+ \((\d*) % (\d*) \+ (\d*) % '
 		r'(\d*)\) \+ "/(.*)";'
 	)
 	for _ in range(1, 4):

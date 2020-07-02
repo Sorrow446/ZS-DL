@@ -114,7 +114,7 @@ def extract(url, server, id):
 		r'([a-zA-Z\d]{8})/" \+ \((\d*) % (\d*) \+ (\d*) % '
 		r'(\d*)\) \+ "/(.*)";'
 	)
-	for _ in range(1, 4):
+	for _ in range(3):
 		r = s.get(url)
 		if r.status_code != 500:
 			break

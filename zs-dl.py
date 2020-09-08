@@ -110,9 +110,9 @@ def check_url(url):
 
 def extract(url, server, id):
 	regex = (
-		r'document.getElementById\(\'dlbutton\'\).href = "/d/'
-		r'([a-zA-Z\d]{8})/" \+ \((\d*) % (\d*) \+ (\d*) % '
-		r'(\d*)\) \+ "/(.*)";'
+		r'document.getElementById\(\'dlbutton\'\).href = \"/d/'
+		r'([a-zA-Z\d]{8})/"\+\((\d*)%(\d*) \+ a\(\) \+ b\(\) \+ '
+		r'c\(\) \+ d \+ 5/5\)\+\"/(.+)";'
 	)
 	for _ in range(3):
 		r = s.get(url)
@@ -125,14 +125,12 @@ def extract(url, server, id):
 		raise Exception('Failed to get file URL. Down?')
 	num_1 = int(meta.group(2))
 	num_2 = int(meta.group(3))
-	num_3 = int(meta.group(4))
-	num_4 = int(meta.group(5))
-	enc_fname = meta.group(6)
-	final_num = num_1 % num_2 + num_3 % num_4
+	final_num = num_1 % num_2 + 11
+	enc_fname = meta.group(4)
 	file_url = "https://www{}.zippyshare.com/d/{}/{}/{}".format(server,
 																id,											 
 															    final_num,
-															    enc_fname)
+															    enc_fname)	
 	fname = unquote(enc_fname)
 	return file_url, fname
 

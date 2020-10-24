@@ -6,6 +6,7 @@ import sys
 import json
 import time
 import argparse
+import traceback
 try:
 	from urllib.parse import unquote
 except ImportError:
@@ -15,31 +16,9 @@ import requests
 from tqdm import tqdm
 
 
-try:
-	if hasattr(sys, 'frozen'):
-		os.chdir(os.path.dirname(sys.executable))
-	else:
-		os.chdir(os.path.dirname(__file__))
-except OSError:
-	pass
-
-s = requests.Session()
-s.headers.update({
-	'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-				  "AppleWebKit/537.36 (KHTML, like Gecko) Chrome"
-				  "/75.0.3770.100 Safari/537.36"
-})
-
-print("""
- _____ _____     ____  __
-|__   |   __|___|    \|  |
-|   __|__   |___|  |  |  |__
-|_____|_____|   |____/|_____|		 
-""")
 
 def read_txt(abs):
 	with open(abs) as f:
-		# All into memory at once.
 		return [u.strip() for u in f.readlines()]
 
 def decrypt_dlc(abs):
@@ -86,7 +65,7 @@ def parse_prefs():
 			try:
 				args.urls = args.urls + decrypt_dlc(url)
 			except Exception as e:
-				err("Failed to decrypt DLC container: " + url, e)
+				err("Failed to decrypt DLC container: " + url)
 			args.urls.remove(url)
 			time.sleep(1)
 	return args
@@ -95,8 +74,9 @@ def dir_setup():
 	if not os.path.isdir(cfg.output_path):
 		os.makedirs(cfg.output_path)
 
-def err(txt, e):
-	print("{}\n{}: {}".format(txt, e.__class__.__name__, e))
+def err(txt):
+	print(txt)
+	traceback.print_exc()
 	
 def set_proxy():
 	s.proxies.update({'https': 'https://' + cfg.proxy})
@@ -110,9 +90,10 @@ def check_url(url):
 
 def extract(url, server, id):
 	regex = (
-		r'document.getElementById\(\'dlbutton\'\).href = \"/d/'
-		r'([a-zA-Z\d]{8})/"\+\((\d*)%(\d*) \+ a\(\) \+ b\(\) \+ '
-		r'c\(\) \+ d \+ 5/5\)\+\"/(.+)";'
+		r'var a = (\d+);\s+'
+		r'document.getElementById\(\'dlbutton\'\).omg = "asdasd".substr\(0, 3\);\s+'
+		r'var b = document.getElementById\(\'dlbutton\'\).omg.length;\s+'
+		r'document.getElementById\(\'dlbutton\'\).href = "/d/[a-zA-Z\d]{8}/"\+\(Math.pow\(a, 3\)\+b\)\+"\/(.+)";'
 	)
 	for _ in range(3):
 		r = s.get(url)
@@ -122,11 +103,10 @@ def extract(url, server, id):
 	r.raise_for_status()
 	meta = re.search(regex, r.text)
 	if not meta:
-		raise Exception('Failed to get file URL. Down?')
-	num_1 = int(meta.group(2))
-	num_2 = int(meta.group(3))
-	final_num = num_1 % num_2 + 11
-	enc_fname = meta.group(4)
+		raise Exception('Failed to get file URL. File down or pattern changed.')
+	num_1 = int(meta.group(1))
+	final_num = pow(num_1, 3) + 3
+	enc_fname = meta.group(2)
 	file_url = "https://www{}.zippyshare.com/d/{}/{}/{}".format(server,
 																id,											 
 															    final_num,
@@ -171,6 +151,27 @@ def main(url):
 	download(url, file_url, fname)
 
 if __name__ == '__main__':
+	try:
+		if hasattr(sys, 'frozen'):
+			os.chdir(os.path.dirname(sys.executable))
+		else:
+			os.chdir(os.path.dirname(__file__))
+	except OSError:
+		pass
+
+	s = requests.Session()
+	s.headers.update({
+		'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+					  "AppleWebKit/537.36 (KHTML, like Gecko) Chrome"
+					  "/75.0.3770.100 Safari/537.36"
+	})
+
+	print("""
+	 _____ _____     ____  __
+	|__   |   __|___|    \|  |
+	|   __|__   |___|  |  |  |__
+	|_____|_____|   |____/|_____|		 
+	""")
 	cfg = parse_prefs()
 	dir_setup()
 	if cfg.proxy:
@@ -181,4 +182,4 @@ if __name__ == '__main__':
 		try:
 			main(url)
 		except Exception as e:
-			err('URL failed.', e)
+			err('URL failed.')

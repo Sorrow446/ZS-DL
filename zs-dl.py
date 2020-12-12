@@ -35,7 +35,6 @@ def decrypt_dlc(abs):
 	return j['success']['links']
 
 def parse_prefs():
-	out_path = os.path.join(os.getcwd(), 'ZS-DL downloads')
 	parser = argparse.ArgumentParser()
 	parser.add_argument(
 		'-u', '--urls', 
@@ -44,7 +43,7 @@ def parse_prefs():
 	)
 	parser.add_argument(
 		'-o', '--output-path',
-		default=out_path,
+		default='ZS-DL downloads',
 		help='Abs output directory.'
 	)
 	parser.add_argument(

@@ -88,12 +88,10 @@ def check_url(url):
 		return match.group(1), match.group(2)
 	raise ValueError("Invalid URL: " + str(url))
 
-def extract(url, server, id):
+def extract(url, server, _id):
 	regex = (
-		r'var a = (\d+);\s+'
-		r'document.getElementById\(\'dlbutton\'\).omg = "asdasd".substr\(0, 3\);\s+'
-		r'var b = document.getElementById\(\'dlbutton\'\).omg.length;\s+'
-		r'document.getElementById\(\'dlbutton\'\).href = "/d/[a-zA-Z\d]{8}/"\+\(Math.pow\(a, 3\)\+b\)\+"\/(.+)";'
+		r'document.getElementById\(\'dlbutton\'\).href = "/d/[a-zA-Z\d]{8}/" '
+		r'\+ \((\d+) % (\d+) \+ (\d+) % (\d+)\) \+ "\/(.+)";'
 	)
 	for _ in range(3):
 		r = s.get(url)
@@ -105,14 +103,13 @@ def extract(url, server, id):
 	if not meta:
 		raise Exception('Failed to get file URL. File down or pattern changed.')
 	num_1 = int(meta.group(1))
-	final_num = pow(num_1, 3) + 3
-	enc_fname = meta.group(2)
-	file_url = "https://www{}.zippyshare.com/d/{}/{}/{}".format(server,
-																id,											 
-															    final_num,
-															    enc_fname)	
-	fname = unquote(enc_fname)
-	return file_url, fname
+	num_2 = int(meta.group(2))
+	num_3 = int(meta.group(3))
+	num_4 = int(meta.group(4))
+	final_num = num_1 % num_2 + num_3 % num_4
+	enc_fname = meta.group(5)
+	file_url = "https://www{}.zippyshare.com/d/{}/{}/{}".format(server, _id, final_num, enc_fname)
+	return file_url, unquote(enc_fname)
 
 def get_file(ref, url):
 	s.headers.update({
@@ -146,8 +143,8 @@ def download(ref, url, fname):
 						bar.update(len(chunk))
 
 def main(url):
-	server, id = check_url(url)
-	file_url, fname = extract(url, server, id)
+	server, _id = check_url(url)
+	file_url, fname = extract(url, server, _id)
 	download(url, file_url, fname)
 
 if __name__ == '__main__':

@@ -5,7 +5,7 @@ Upload to Zippyshare with [ZS-UL](https://github.com/Sorrow446/ZS-UL).
 
 **People have been seen selling my tools. DO NOT buy them. My tools are free and always will be.**
 
-![](https://orion.feralhosting.com/sorrow/share/ZS-DL.png)
+![](https://i.imgur.com/dQhVL75.png)
 
 # Usage
 Download two files to default directory:    

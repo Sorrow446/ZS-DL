@@ -3,7 +3,7 @@ CLI Zippyshare downloader written in Python. JS execution and BSoup-**FREE**.
 [Windows binaries](https://github.com/Sorrow446/ZS-DL/releases)   
 Upload to Zippyshare with [ZS-UL](https://github.com/Sorrow446/ZS-UL).    
 **People have been seen selling my tools. DO NOT buy them. My tools are free and always will be.**   
-![](https://i.imgur.com/dQhVL75.png)
+![](https://i.imgur.com/maoyc07.png)
 
 # Usage
 Download two files to default directory:    

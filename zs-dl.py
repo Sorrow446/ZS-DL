@@ -90,12 +90,8 @@ def check_url(url):
 
 def extract(url, server, _id):
 	regex = (
-		r'var a = (\d{6});\s+var b = (\d{6});\s+document\.getElementById'
-		r'\(\'dlbutton\'\).omg = "f";\s+if \(document.getElementById\(\''
-		r'dlbutton\'\).omg != \'f\'\) {\s+a = Math.ceil\(a/3\);\s+} else'
-		r' {\s+a = Math.floor\(a/3\);\s+}\s+document.getElementById\(\'d'
-		r'lbutton\'\).href = "/d/[a-zA-Z\d]{8}/\"\+\(a \+ \d{6}%b\)\+"/('
-		r'[\w%-.]+)";'
+		r'document.getElementById\(\'dlbutton\'\).href = "/d/[a-zA-Z\d]{8}/" \+ '
+		r'\((\d{6}) % 51245 \+ (\d{6}) % 913\) \+ "/([\w%-.]+)";'
 	)
 	for _ in range(3):
 		r = s.get(url)
@@ -106,10 +102,9 @@ def extract(url, server, _id):
 	meta = re.search(regex, r.text, re.DOTALL)
 	if not meta:
 		raise Exception('Failed to get file URL. File down or pattern changed.')
-	num_1_ = int(meta.group(1))
-	num_1 = math.floor(num_1_/3)
+	num_1 = int(meta.group(1))
 	num_2 = int(meta.group(2))
-	final_num = num_1 + num_1_ % num_2
+	final_num = num_1 % 51245 + num_2 % 913	
 	enc_fname = meta.group(3)
 	file_url = "https://www{}.zippyshare.com/d/{}/{}/{}".format(server, _id, final_num, enc_fname)
 	return file_url, unquote(enc_fname)

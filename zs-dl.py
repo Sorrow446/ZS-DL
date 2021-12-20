@@ -90,7 +90,7 @@ def check_url(url):
 
 def extract(url, server, _id):
 	regex = (
-		r'time=(\d+)'
+		r'var z = (\d{6});'
 	)
 	for _ in range(3):
 		r = s.get(url)
@@ -101,10 +101,10 @@ def extract(url, server, _id):
 	meta = re.search(regex, r.text)
 	if not meta:
 		raise Exception('Failed to get file URL. File down or pattern changed.')
-	t = int(meta.group(1))
+	z = int(meta.group(1))
+	t = z - 3
 	n = t % 2
 	b = t % 3
-	z = t + 3
 	final_num = n + b + z - 3
 
 	regex2 = (

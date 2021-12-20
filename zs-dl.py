@@ -93,7 +93,7 @@ def extract(url, server, _id):
 		r'time=(\d+)'
 	)
 	regex2 = (
-		r'document.getElementById\(\'dlbutton\'\).href = "/d/.*([\w%-.]+)";'
+		r'document.getElementById\(\'dlbutton\'\).href = "/d/.*/([\w%-.]+)";'
 	)
 	for _ in range(3):
 		r = s.get(url)
@@ -102,7 +102,6 @@ def extract(url, server, _id):
 		time.sleep(1)
 	r.raise_for_status()
 	meta = re.search(regex, r.text)
-	meta2 = re.search(regex2, r.text, re.DOTALL)
 	if not meta:
 		raise Exception('Failed to get file URL. File down or pattern changed.')
 	t = int(meta.group(1))
@@ -110,6 +109,9 @@ def extract(url, server, _id):
 	b = t % 3
 	z = t + 3
 	final_num = n + b + z - 3
+	meta2 = re.search(regex2, r.text, re.DOTALL)
+	if not meta2:
+		raise Exception('Failed to get file name. File down or pattern changed.')
 	enc_fname = meta2.group(1)
 	file_url = "https://www{}.zippyshare.com/d/{}/{}/{}".format(server, _id, final_num, enc_fname)
 	return file_url, unquote(enc_fname)

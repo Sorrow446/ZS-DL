@@ -92,9 +92,6 @@ def extract(url, server, _id):
 	regex = (
 		r'time=(\d+)'
 	)
-	regex2 = (
-		r'document.getElementById\(\'dlbutton\'\).href = "/d/.*/([\w%-.]+)";'
-	)
 	for _ in range(3):
 		r = s.get(url)
 		if r.status_code != 500:
@@ -109,6 +106,10 @@ def extract(url, server, _id):
 	b = t % 3
 	z = t + 3
 	final_num = n + b + z - 3
+
+	regex2 = (
+		r'document.getElementById\(\'dlbutton\'\).href = "/d/.*"/([\w%-.]+)";'
+	)
 	meta2 = re.search(regex2, r.text, re.DOTALL)
 	if not meta2:
 		raise Exception('Failed to get file name. File down or pattern changed.')

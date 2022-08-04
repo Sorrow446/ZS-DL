@@ -90,7 +90,8 @@ def check_url(url):
 
 def extract(url, server, _id):
 	regex = (
-		r'document.getElementById\(\'dlbutton\'\).href = "/d/[a-zA-Z\d]{8}/"\+\((\d{6})'
+		# r'document.getElementById\(\'dlbutton\'\).href = "/d/[a-zA-Z\d]{8}/"\+\((\d{6})'
+		r'document.getElementById\(\'dlbutton\'\).href = "/d/[a-zA-Z\d]{8}/" \+ \((.*)\) \+'
 	)
 	for _ in range(3):
 		r = s.get(url)
@@ -101,12 +102,13 @@ def extract(url, server, _id):
 	meta = re.search(regex, r.text)
 	if not meta:
 		raise Exception('Failed to get file URL. File down or pattern changed.')
-	z = int(meta.group(1)) % 1000
-	a = 1
-	b = a + 1
-	c = b + 1
-	d = 2*2
-	final_num = z + a + b + c + d + 1
+	# z = int(meta.group(1)) % 1000
+	# a = 1
+	# b = a + 1
+	# c = b + 1
+	# d = 2*2
+	# final_num = z + a + b + c + d + 1
+	final_num = eval(meta.group(1))
 
 	regex2 = (
 		r'document.getElementById\(\'dlbutton\'\).href = "/d/.*"/([\w%-.]+)";'

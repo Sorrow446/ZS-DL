@@ -8,6 +8,7 @@ import json
 import time
 import argparse
 import traceback
+from uuid import RFC_4122
 try:
 	from urllib.parse import unquote
 except ImportError:
@@ -15,8 +16,6 @@ except ImportError:
 
 import requests
 from tqdm import tqdm
-
-
 
 def read_txt(abs):
 	with open(abs) as f:
@@ -89,26 +88,37 @@ def check_url(url):
 	raise ValueError("Invalid URL: " + str(url))
 
 def extract(url, server, _id):
-	regex = (
-		# r'document.getElementById\(\'dlbutton\'\).href = "/d/[a-zA-Z\d]{8}/"\+\((\d{6})'
-		r'document.getElementById\(\'dlbutton\'\).href = "/d/[a-zA-Z\d]{8}/" \+ \((.*)\) \+'
-	)
+	
+	regex_arr = {
+		'r1' : 'document.getElementById\(\'dlbutton\'\).href = "/d/[a-zA-Z\d]{8}/"\+\((\d{6})',
+		'r2' : 'document.getElementById\(\'dlbutton\'\).href = "/d/[a-zA-Z\d]{8}/" \+ \((.*)\) \+'
+	}
+
 	for _ in range(3):
 		r = s.get(url)
 		if r.status_code != 500:
 			break
 		time.sleep(1)
 	r.raise_for_status()
-	meta = re.search(regex, r.text)
-	if not meta:
-		raise Exception('Failed to get file URL. File down or pattern changed.')
-	# z = int(meta.group(1)) % 1000
-	# a = 1
-	# b = a + 1
-	# c = b + 1
-	# d = 2*2
-	# final_num = z + a + b + c + d + 1
-	final_num = eval(meta.group(1))
+
+	for key, regex in regex_arr.items():
+		# print(regex)
+		meta = re.search(regex, r.text)
+		if meta:
+			rid = key
+			break
+	else:
+		raise Exception('Pattern changed.')
+
+	if rid == "r1":
+		z = int(meta.group(1)) % 1000
+		a = 1
+		b = a + 1
+		c = b + 1
+		d = 2*2
+		final_num = z + a + b + c + d + 1
+	elif rid == "r2":
+		final_num = eval(meta.group(1))
 
 	regex2 = (
 		r'document.getElementById\(\'dlbutton\'\).href = "/d/.*"/([\w%-.]+)";'
@@ -154,7 +164,6 @@ def download(ref, url, fname):
 def main(url):
 	server, _id = check_url(url)
 	file_url, fname = extract(url, server, _id)
-	print(file_url)
 	download(url, file_url, fname)
 
 if __name__ == '__main__':
@@ -185,7 +194,7 @@ if __name__ == '__main__':
 		set_proxy()
 	total = len(cfg.urls)
 	for num, url in enumerate(cfg.urls, 1):
-		print("\nURL {} of {}:".format(num, total))
+		print("{} of {}:".format(num, total))
 		try:
 			main(url)
 		except Exception as e:

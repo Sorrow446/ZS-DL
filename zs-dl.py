@@ -92,7 +92,7 @@ def extract(url, server, _id):
 	regex_arr = {
 		'r1' : 'document.getElementById\(\'dlbutton\'\).href = "/d/[a-zA-Z\d]{8}/"\+\((\d{6})',
 		'r2' : 'document.getElementById\(\'dlbutton\'\).href = "/d/[a-zA-Z\d]{8}/" \+ \((.*)\) \+',
-		'r3' : 'var a = (\d{6});\n.*?var b = (\d{6})'
+		'r3' : 'var a = (\d+);\n.*?var b = (\d+);\n.*?omg = "([a-z])"'
 	}
 
 	for _ in range(3):
@@ -123,8 +123,14 @@ def extract(url, server, _id):
 		final_num = eval(meta.group(1))
 	elif rid == "r3":
 		a = int(meta.group(1))
-		z = math.ceil(a/3)
 		b = int(meta.group(2))
+		f = meta.group(3)
+
+		if f != "f":
+			z = math.ceil(a/3)
+		else:
+			z = math.floor(a/3)
+			
 		final_num = z + (a % b)
 
 	regex2 = (

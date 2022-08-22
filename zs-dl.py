@@ -92,7 +92,8 @@ def extract(url, server, _id):
 	regex_arr = {
 		'r1' : 'document.getElementById\(\'dlbutton\'\).href = "/d/[a-zA-Z\d]{8}/"\+\((\d{6})',
 		'r2' : 'document.getElementById\(\'dlbutton\'\).href = "/d/[a-zA-Z\d]{8}/" \+ \((.*)\) \+',
-		'r3' : 'var a = (\d+);\n.*?var b = (\d+);\n.*?omg = "([a-z])"'
+		'r3' : 'var a = (\d+);\n.*\n.*\n.*?document.getElementById\(\'dlbutton\'\).href = "/d/[a-zA-Z\d]{8}/"\+\((.*)\)\+',
+		'r4' : 'var a = (\d+);\n.*?var b = (\d+);\n.*?omg = "([a-z])"'
 	}
 
 	for _ in range(3):
@@ -122,6 +123,10 @@ def extract(url, server, _id):
 	elif rid == "r2":
 		final_num = eval(meta.group(1))
 	elif rid == "r3":
+		a = int(meta.group(1))
+		b = 3
+		final_num = math.ceil(eval(str(meta.group(2)).lower()))
+	elif rid == "r4":
 		a = int(meta.group(1))
 		b = int(meta.group(2))
 		f = meta.group(3)

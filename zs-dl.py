@@ -97,7 +97,7 @@ def extract(url, server, _id):
 	}
 
 	for _ in range(3):
-		r = s.get(url)
+		r = s.get(url, verify=False)
 		if r.status_code != 500:
 			break
 		time.sleep(1)
@@ -153,7 +153,7 @@ def get_file(ref, url):
 		'Range': "bytes=0-",
 		'Referer': ref
 	})
-	r = s.get(url, stream=True)
+	r = s.get(url, stream=True, verify=False)
 	del s.headers['Range']
 	del s.headers['Referer']
 	r.raise_for_status()

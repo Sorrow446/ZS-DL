@@ -93,7 +93,8 @@ def extract(url, server, _id):
 		'r1' : 'document.getElementById\(\'dlbutton\'\).href = "/d/[a-zA-Z\d]{8}/"\+\((\d{6})',
 		'r2' : 'document.getElementById\(\'dlbutton\'\).href = "/d/[a-zA-Z\d]{8}/" \+ \((.*)\) \+',
 		'r3' : 'var a = (\d+);\n.*\n.*\n.*?document.getElementById\(\'dlbutton\'\).href = "/d/[a-zA-Z\d]{8}/"\+\((.*)\)\+',
-		'r4' : 'var a = (\d+);\n.*?var b = (\d+);\n.*?omg = "([a-z])"'
+		'r4' : 'var a = (\d+);\n.*?var b = (\d+);\n.*?omg = "([a-z])"',
+		'r5' : '.*?omg = (\d+%\d+);'
 	}
 
 	for _ in range(3):
@@ -104,9 +105,9 @@ def extract(url, server, _id):
 	r.raise_for_status()
 
 	for key, regex in regex_arr.items():
-		# print(regex)
+		print(regex)
 		meta = re.search(regex, r.text)
-		# print(meta)
+		print(meta)
 		if meta:
 			rid = key
 			break
@@ -137,9 +138,15 @@ def extract(url, server, _id):
 			z = math.floor(a/3)
 			
 		final_num = z + (a % b)
+	elif rid == "r5":
+		a = int(meta.group(1).split('%')[0])
+		z = int(meta.group(1).split('%')[1])
+		omg = a % z
+		b = omg * (a % 3)
+		final_num = b + 18
 
 	regex2 = (
-		r'document.getElementById\(\'dlbutton\'\).href = "/d/.*"/([\w%-.]+)";'
+		r'document.getElementById\(\'dlbutton\'\).href.*= "/d/.*"/([\w%-.]+)";'
 	)
 	meta2 = re.search(regex2, r.text, re.DOTALL)
 	if not meta2:

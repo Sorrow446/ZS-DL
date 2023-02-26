@@ -105,9 +105,9 @@ def extract(url, server, _id):
 	r.raise_for_status()
 
 	for key, regex in regex_arr.items():
-		print(regex)
+		# print(regex)
 		meta = re.search(regex, r.text)
-		print(meta)
+		# print(meta)
 		if meta:
 			rid = key
 			break

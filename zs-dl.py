@@ -8,6 +8,7 @@ import json
 import time
 import argparse
 import traceback
+from uuid import RFC_4122
 try:
 	from urllib.parse import unquote
 except ImportError:
@@ -15,8 +16,6 @@ except ImportError:
 
 import requests
 from tqdm import tqdm
-
-
 
 def read_txt(abs):
 	with open(abs) as f:
@@ -89,23 +88,70 @@ def check_url(url):
 	raise ValueError("Invalid URL: " + str(url))
 
 def extract(url, server, _id):
-	regex = (
-		r'document.getElementById\(\'dlbutton\'\).href = "/d/[a-zA-Z\d]{8}/" \+ '
-		r'\((\d{6}) % 51245 \+ (\d{6}) % 913\) \+ "/([\w%-.]+)";'
-	)
+	
+	regex_arr = {
+		'r1' : 'document.getElementById\(\'dlbutton\'\).href = "/d/[a-zA-Z\d]{8}/"\+\((\d{6})',
+		'r2' : 'document.getElementById\(\'dlbutton\'\).href = "/d/[a-zA-Z\d]{8}/" \+ \((.*)\) \+',
+		'r3' : 'var a = (\d+);\n.*\n.*\n.*?document.getElementById\(\'dlbutton\'\).href = "/d/[a-zA-Z\d]{8}/"\+\((.*)\)\+',
+		'r4' : 'var a = (\d+);\n.*?var b = (\d+);\n.*?omg = "([a-z])"',
+		'r5' : '.*?omg = (\d+%\d+);'
+	}
+
 	for _ in range(3):
 		r = s.get(url)
 		if r.status_code != 500:
 			break
 		time.sleep(1)
 	r.raise_for_status()
-	meta = re.search(regex, r.text, re.DOTALL)
-	if not meta:
-		raise Exception('Failed to get file URL. File down or pattern changed.')
-	num_1 = int(meta.group(1))
-	num_2 = int(meta.group(2))
-	final_num = num_1 % 51245 + num_2 % 913	
-	enc_fname = meta.group(3)
+
+	for key, regex in regex_arr.items():
+		# print(regex)
+		meta = re.search(regex, r.text)
+		# print(meta)
+		if meta:
+			rid = key
+			break
+	else:
+		raise Exception('Pattern changed.')
+
+	if rid == "r1":
+		z = int(meta.group(1)) % 1000
+		a = 1
+		b = a + 1
+		c = b + 1
+		d = 2*2
+		final_num = z + a + b + c + d + 1
+	elif rid == "r2":
+		final_num = eval(meta.group(1))
+	elif rid == "r3":
+		a = int(meta.group(1))
+		b = 3
+		final_num = math.ceil(eval(str(meta.group(2)).lower()))
+	elif rid == "r4":
+		a = int(meta.group(1))
+		b = int(meta.group(2))
+		f = meta.group(3)
+
+		if f != "f":
+			z = math.ceil(a/3)
+		else:
+			z = math.floor(a/3)
+			
+		final_num = z + (a % b)
+	elif rid == "r5":
+		a = int(meta.group(1).split('%')[0])
+		z = int(meta.group(1).split('%')[1])
+		omg = a % z
+		b = omg * (a % 3)
+		final_num = b + 18
+
+	regex2 = (
+		r'document.getElementById\(\'dlbutton\'\).href.*= "/d/.*"/([\w%-.]+)";'
+	)
+	meta2 = re.search(regex2, r.text, re.DOTALL)
+	if not meta2:
+		raise Exception('Failed to get file name. File down or pattern changed.')
+	enc_fname = meta2.group(1)
 	file_url = "https://www{}.zippyshare.com/d/{}/{}/{}".format(server, _id, final_num, enc_fname)
 	return file_url, unquote(enc_fname)
 
@@ -173,7 +219,7 @@ if __name__ == '__main__':
 		set_proxy()
 	total = len(cfg.urls)
 	for num, url in enumerate(cfg.urls, 1):
-		print("\nURL {} of {}:".format(num, total))
+		print("{} of {}:".format(num, total))
 		try:
 			main(url)
 		except Exception as e:
